@@ -1,3 +1,8 @@
+using IMS.Plugins.EFCore;
+using IMS.UseCases;
+using IMS.UseCases.PluginInterfaces;
+using IMS.UseCases.Interfaces;
+
 using IMS.WebApp.Areas.Identity;
 using IMS.WebApp.Data;
 using Microsoft.AspNetCore.Components;
@@ -6,11 +11,21 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
+using IMS.CoreBusiness;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// efcore config 
+var connectionString = builder.Configuration.GetConnectionString("KabumDatabaseConnection");
+
+builder.Services.AddDbContext<IMSContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+});
+
+// Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -19,9 +34,19 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-builder.Services.AddSingleton<WeatherForecastService>();
+
+// DI Repositories
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+
+// DI UseCases
+builder.Services.AddTransient<IViewUsersByNameUseCase, ViewUsersByNameUseCase>();
 
 var app = builder.Build();
+
+var scope = app.Services.CreateScope();
+var imsContext = scope.ServiceProvider.GetRequiredService<IMSContext>();
+imsContext.Database.EnsureDeleted();
+imsContext.Database.EnsureCreated();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

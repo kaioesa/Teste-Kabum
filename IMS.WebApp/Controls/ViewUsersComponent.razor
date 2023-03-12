@@ -1,0 +1,28 @@
+﻿@using IMS.CoreBusiness;
+@using IMS.UseCases.Interfaces;
+@inject IViewUsersByNameUseCase ViewUsersByNameUseCase
+
+<div class="input-group mb-3">
+    <input type="text"
+           class="form-control form-control-lg"
+           placeholder="Type the user name to search!"
+           @bind-value="userNameToSearch" />
+    <button type="button"
+            class="input-group-text btn-primary"
+            @onclick="@(async ()=> {await ViewUsers();})">
+        Search
+    </button>
+</div>
+
+@code {
+    private string? userNameToSearch;
+
+    [Parameter]
+    public EventCallback<List<User>> OnSearchUsers { get; set; }
+
+    private async Task ViewUsers()
+    {
+        var users = (await ViewUsersByNameUseCase.
+            ExecuteAsync(userNameToSearch ?? string.Empty)).ToList();
+    }
+}

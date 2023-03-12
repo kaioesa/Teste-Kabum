@@ -1,4 +1,4 @@
-﻿namespace CoreBusiness
+﻿namespace IMS.CoreBusiness
 {
     public class User
     {

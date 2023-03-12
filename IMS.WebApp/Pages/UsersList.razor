@@ -1,0 +1,61 @@
+﻿@page "/users"
+<h3>Users List</h3>
+
+<br />
+
+<ViewUsersComponent OnSearchUsers="OnSearchUsers" />
+
+@if (listUsers != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var usr in this.listUsers)
+            {
+                <tr>
+                    <td>@usr.Name</td>
+                    <td>@usr.CPF</td>
+                    <td>@usr.RG</td>
+                    <td>@usr.PhoneNumber</td>
+                    <td>@usr.Birthdate</td>
+                    <td>@usr.UserAddress</td>
+
+                    @foreach (var addr in usr.UserAddress)
+                    {
+                    <tr>
+                        <li>
+                                @addr.Street,
+                                @addr.City,
+                                @addr.State,
+                                @addr.PostalCode,
+                        </li>
+                    </tr>
+                    }
+                </tr >
+            <td>
+                <button type="button" class="btn btn-light">Edit</button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-light">Delete</button>
+            </td>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private List<User>? listUsers;
+
+    private void OnSearchUsers(List<User> users)
+    {
+        listUsers = users;
+    }
+}
